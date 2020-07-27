@@ -11,6 +11,14 @@
 |
 */
 
+/** @var \Laravel\Lumen\Routing\Router $router */
+
+
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->post('/github/webhook-receive', [
+    'as' => 'github.webhook.receive',
+    'uses' => 'GithubWebhookController@receive'
+]);
