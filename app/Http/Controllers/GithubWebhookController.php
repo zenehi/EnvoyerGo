@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Dotenv\Dotenv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Symfony\Component\Process\Process;
@@ -53,7 +54,10 @@ class GithubWebhookController extends Controller
 
         echo 'Path: ', $sourcePath, PHP_EOL;
 
-        $process = new Process([base_path('scripts/deploy.sh'), $sourcePath]);
+        $dotEnv = Dotenv::createImmutable($sourcePath);
+        $envVars = $dotEnv->safeLoad();
+
+        $process = new Process(['/bin/bash', base_path('scripts/deploy.sh'), $sourcePath], null, $envVars);
         $process->run(function ($type, $buffer) {
             echo $buffer;
         });
