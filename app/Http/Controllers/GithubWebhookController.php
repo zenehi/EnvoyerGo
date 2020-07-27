@@ -31,7 +31,7 @@ class GithubWebhookController extends Controller
         $localHash = 'sha1=' . hash_hmac('sha1', $githubPayload, $localToken, false);
 
         if (!hash_equals($githubHash, $localHash)) {
-            return response()->setStatusCode(403)->setContent('Authorization Error');
+            return response('Authorization Error', 403);
         }
 
         // Log info
@@ -60,7 +60,7 @@ class GithubWebhookController extends Controller
 
         echo 'Nothing todo!', PHP_EOL;
 
-        return response()->setStatusCode(201)->setContent('Nothing Todo!');
+        return response('Nothing Todo!', 201);
     }
 
     protected function build($sourcePath)
