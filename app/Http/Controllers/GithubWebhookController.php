@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Discord;
 use Dotenv\Dotenv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -10,6 +11,16 @@ use Symfony\Component\Process\Process;
 
 class GithubWebhookController extends Controller
 {
+    /**
+     * @var array
+     */
+    protected $payload;
+
+    /**
+     * @var Discord
+     */
+    protected $_discord;
+
 
     public function receive(Request $request)
     {
@@ -25,6 +36,7 @@ class GithubWebhookController extends Controller
 
         // Log info
         $payload = json_decode($request->input('payload'), true);
+        $this->payload = $payload;
 
 
         if (Arr::get($payload, 'action') === 'closed' && Arr::get($payload, 'pull_request.merged')) {
@@ -34,23 +46,28 @@ class GithubWebhookController extends Controller
             if (Arr::get($payload, 'pull_request.base.ref') === $prodBranch) {
                 // production
                 $sourcePath = env('APP_DEPLOY_PRODUCTION_PATH');
-                $this->build($sourcePath);
+                return $this->build($sourcePath);
             }
 
             if (Arr::get($payload, 'pull_request.base.ref') === $devBranch) {
                 // Development
                 $sourcePath = env('APP_DEPLOY_DEVELOPMENT_PATH');
-                $this->build($sourcePath);
+                return $this->build($sourcePath);
             }
 
         }
 
-        return '';
+
+        echo 'Nothing todo!', PHP_EOL;
+
+        return response()->setStatusCode(201)->setContent('Nothing Todo!');
     }
 
     protected function build($sourcePath)
     {
         echo 'START BUILD', PHP_EOL;
+
+        $this->sendToLog('START building `' . Arr::get($this->payload, 'pull_request.base.ref') . '`');
 
         echo 'Path: ', $sourcePath, PHP_EOL;
 
@@ -62,7 +79,29 @@ class GithubWebhookController extends Controller
             echo $buffer;
         });
 
+        $this->sendToLog('COMPLETED building `' . Arr::get($this->payload, 'pull_request.base.ref') . '`');
+
         echo 'COMPLETED BUILD', PHP_EOL;
+    }
+
+    protected function sendToLog($msg)
+    {
+        try {
+
+            $this->getDiscordService()->sendMessage($msg);
+
+        } catch (\Exception $e) {
+            //
+        }
+    }
+
+    protected function getDiscordService()
+    {
+        if ($this->_discord === null) {
+            $this->_discord = new Discord(env('LOG_DISCORD_WEBHOOK_URL'));
+        }
+
+        return $this->_discord;
     }
 
 }

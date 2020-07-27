@@ -6,8 +6,10 @@
     "type": "project",
     "require": {
         "php": "^7.2.5",
+        "ext-curl": "*",
         "ext-json": "*",
-        "laravel/lumen-framework": "^7.0"
+        "laravel/lumen-framework": "^7.0",
+        "laravel/tinker": "^2.4"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9.1",
