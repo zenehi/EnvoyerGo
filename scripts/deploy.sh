@@ -20,8 +20,8 @@ composer install --no-interaction --no-dev --prefer-dist
 # php artisan cache:clear
 
 # config cache
-# php artisan config:clear
-php artisan config:cache
+php artisan config:clear
+# php artisan config:cache
 
 # cache route
 # php artisan route:clear
@@ -34,6 +34,11 @@ php artisan route:cache
 # update database
 php artisan migrate --force
 	# --force		Required to run when in production.
+
+
+# config cache
+# php artisan config:clear
+# php artisan config:cache
 
 
 # stop maintenance mode
