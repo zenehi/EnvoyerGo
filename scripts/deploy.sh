@@ -23,11 +23,11 @@ composer install --no-interaction --no-dev --prefer-dist
 php artisan config:clear
 
 # cache config
-#php artisan config:cache
+php artisan config:cache
 
 # cache route
 php artisan route:clear
-#php artisan route:cache
+php artisan route:cache
 
 # restart queues
 # php artisan -v queue:restart

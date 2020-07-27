@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Symfony\Component\Process\Process;
 
 
@@ -22,20 +23,20 @@ class GithubWebhookController extends Controller
         }
 
         // Log info
-        $payload = collect(json_decode($request->input('payload'), true));
+        $payload = json_decode($request->input('payload'), true);
 
 
-        if ($payload->get('action') === 'closed' && $payload->get('pull_request.merged') === true) {
+        if (Arr::get($payload, 'action') === 'closed' && Arr::get($payload, 'pull_request.merged')) {
             $prodBranch = env('APP_DEPLOY_PRODUCTION_BRANCH');
             $devBranch = env('APP_DEPLOY_DEVELOPMENT_BRANCH');
 
-            if ($payload->get('pull_request.base.ref') === $prodBranch) {
+            if (Arr::get($payload, 'pull_request.base.ref') === $prodBranch) {
                 // production
                 $sourcePath = env('APP_DEPLOY_PRODUCTION_PATH');
                 $this->build($sourcePath);
             }
 
-            if ($payload->get('pull_request.base.ref') === $devBranch) {
+            if (Arr::get($payload, 'pull_request.base.ref') === $devBranch) {
                 // Development
                 $sourcePath = env('APP_DEPLOY_DEVELOPMENT_PATH');
                 $this->build($sourcePath);
@@ -49,6 +50,8 @@ class GithubWebhookController extends Controller
     protected function build($sourcePath)
     {
         echo 'START BUILD', PHP_EOL;
+
+        echo 'Path: ', $sourcePath, PHP_EOL;
 
         $process = new Process([base_path('scripts/deploy.sh'), $sourcePath]);
         $process->run(function ($type, $buffer) {
