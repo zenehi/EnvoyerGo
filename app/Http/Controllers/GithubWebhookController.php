@@ -26,15 +26,19 @@ class GithubWebhookController extends Controller
 
 
         if ($payload->get('action') === 'closed' && $payload->get('pull_request.merged') === true) {
+            $prodBranch = env('APP_DEPLOY_PRODUCTION_BRANCH');
+            $devBranch = env('APP_DEPLOY_DEVELOPMENT_BRANCH');
 
-            if ($payload->get('pull_request.base.ref') === 'master') {
+            if ($payload->get('pull_request.base.ref') === $prodBranch) {
                 // production
-                $this->build();
+                $sourcePath = env('APP_DEPLOY_PRODUCTION_PATH');
+                $this->build($sourcePath);
             }
 
-            if ($payload->get('pull_request.base.ref') === 'development') {
+            if ($payload->get('pull_request.base.ref') === $devBranch) {
                 // Development
-                $this->build();
+                $sourcePath = env('APP_DEPLOY_DEVELOPMENT_PATH');
+                $this->build($sourcePath);
             }
 
         }
@@ -42,11 +46,11 @@ class GithubWebhookController extends Controller
         return '';
     }
 
-    protected function build()
+    protected function build($sourcePath)
     {
         echo 'START BUILD', PHP_EOL;
 
-        $process = new Process([base_path('deploy/deploy.sh'), base_path()]);
+        $process = new Process([base_path('scripts/deploy.sh'), $sourcePath]);
         $process->run(function ($type, $buffer) {
             echo $buffer;
         });
