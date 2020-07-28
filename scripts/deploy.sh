@@ -9,7 +9,7 @@ php artisan down
 git pull
 
 # update PHP dependencies
-export COMPOSER_HOME='/usr/bin/composer'
+export COMPOSER_HOME='/var/www/.composer'
 composer install --no-interaction --no-dev --prefer-dist
 	# --no-interaction	Do not ask any interactive question
 	# --no-dev		Disables installation of require-dev packages.
