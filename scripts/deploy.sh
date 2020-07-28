@@ -20,7 +20,7 @@ composer install --no-interaction --no-dev --prefer-dist
 # php artisan cache:clear
 
 # config cache
-php artisan config:clear
+# php artisan config:clear
 # php artisan config:cache
 
 # cache route
