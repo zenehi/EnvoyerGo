@@ -10,7 +10,7 @@ git pull
 
 # update PHP dependencies
 export COMPOSER_HOME='/var/www/.composer'
-composer install --no-interaction --no-dev --prefer-dist
+composer install --no-interaction --no-dev
 	# --no-interaction	Do not ask any interactive question
 	# --no-dev		Disables installation of require-dev packages.
 	# --prefer-dist		Forces installation from package dist even for dev versions.
@@ -25,7 +25,7 @@ composer install --no-interaction --no-dev --prefer-dist
 
 # cache route
 # php artisan route:clear
-php artisan route:cache
+# php artisan route:cache
 
 # restart queues
 # php artisan -v queue:restart
