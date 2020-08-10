@@ -67,7 +67,7 @@ class GithubWebhookController extends Controller
     {
         echo 'START BUILD', PHP_EOL;
 
-        $this->sendToLog('START building `' . Arr::get($this->payload, 'pull_request.base.ref') . '`');
+        $this->sendToLog('START building on branch `' . Arr::get($this->payload, 'pull_request.base.ref') . '`: ' . Arr::get($this->payload, 'pull_request.title'));
 
         echo 'Path: ', $sourcePath, PHP_EOL;
 
@@ -75,13 +75,13 @@ class GithubWebhookController extends Controller
         $envVars = $dotEnv->safeLoad();
 
         $process = new Process(['/bin/bash', base_path('scripts/deploy.sh'), $sourcePath], null, $envVars);
-        $process->run(function ($type, $buffer) {
+        $returnCode = $process->run(function ($type, $buffer) {
             echo $buffer;
         });
 
-        $this->sendToLog('COMPLETED building `' . Arr::get($this->payload, 'pull_request.base.ref') . '`');
+        $this->sendToLog('COMPLETED building `' . Arr::get($this->payload, 'pull_request.base.ref') . '`. Return code: `' . $returnCode . '`');
 
-        echo 'COMPLETED BUILD', PHP_EOL;
+        echo 'COMPLETED BUILD. Return code: ' . $returnCode, PHP_EOL;
     }
 
     protected function sendToLog($msg)
